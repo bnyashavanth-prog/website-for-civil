@@ -53,10 +53,10 @@ export async function middleware(request: NextRequest) {
       // Check role IN ('operations', 'super_admin', 'accounts')
   }
 
-  // 3. Customer Portal (Dashboard)
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+  // 3. Customer Portal (Booking & Tracking)
+  if (request.nextUrl.pathname.startsWith('/booking') || request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/track')) {
       if (!user) {
-          url.pathname = '/login' // Assuming a /login exists on public portal
+          url.pathname = '/login'
           return NextResponse.redirect(url)
       }
   }
