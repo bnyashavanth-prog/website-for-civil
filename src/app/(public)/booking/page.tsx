@@ -39,21 +39,11 @@ export default function MaterialBooking() {
         return;
       }
 
-      const { data: profile } = await supabase.from('user_profiles').select('tenant_id').eq('id', user.id).single();
-      if (!profile) {
-        setError("Could not find user profile.");
-        setLoading(false);
-        return;
-      }
-
-      // We need to resolve the category and subcategory IDs
-      // For now, if we don't have the exact IDs, this might fail foreign key constraints.
-      // We should ideally fetch categories in Step 1.
-      // As a workaround since this is a demo, we can just insert with null subcategory
-      // OR we need to fetch the subcategory ID based on the name.
+      // Hardcode tenant_id since we are on the single-tenant SS Build platform
+      const tenantId = '00000000-0000-0000-0000-000000000001';
       
       const { error: insertError } = await supabase.from('bookings').insert({
-        tenant_id: profile.tenant_id,
+        tenant_id: tenantId,
         customer_id: user.id,
         booking_type: 'material',
         quantity: formData.quantity,
