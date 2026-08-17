@@ -1,46 +1,86 @@
-"use client";
-import { useState } from "react";
-import { UploadCloud, Image as ImageIcon, Trash2 } from "lucide-react";
+"use client"
+import React, { useEffect, useState } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
+import { Upload, Loader2, Image as ImageIcon } from 'lucide-react'
 
-export default function SiteMediaPage() {
-  const [images, setImages] = useState([
-    { id: '1', slot: 'hero_1', url: 'https://images.unsplash.com/photo-1541888081622-2646271c61be?q=80&w=600', uploadedAt: '2024-03-01' },
-    { id: '2', slot: 'gallery_1', url: 'https://images.unsplash.com/photo-1587848651817-640a4af10fb8?q=80&w=600', uploadedAt: '2024-03-05' }
-  ]);
+const TENANT_ID = '00000000-0000-0000-0000-000000000001'
+
+export default function MediaPage() {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const [loading, setLoading] = useState(true)
+  const [mediaItems, setMediaItems] = useState<any[]>([])
+
+  const fetchMedia = async () => {
+    setLoading(true)
+    try {
+      const { data } = await supabase
+        .from('site_media')
+        .select('*, categories(name)')
+        .eq('tenant_id', TENANT_ID)
+        .order('display_order', { ascending: true })
+      setMediaItems(data || [])
+    } catch (error) {
+      console.error("Error fetching media:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchMedia()
+  }, [])
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Site Media Management</h1>
-        <button className="btn btn-primary"><UploadCloud size={18} style={{ marginRight: '0.5rem' }}/> Upload New Image</button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Site Media</h1>
+        <button 
+          className="btn btn-primary"
+          style={{ padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius)', backgroundColor: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer' }}
+          onClick={() => alert("Image upload requires setting up a Supabase Storage bucket first. Feature coming soon!")}
+        >
+          <Upload size={20} /> Upload Image
+        </button>
       </div>
-      
-      <p style={{ marginBottom: '2rem', color: 'gray' }}>Manage images used on the public customer portal. Images upload directly to Supabase Storage.</p>
 
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '1rem' }}>Hero Banners</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-          
-          {/* Mock Image Card */}
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
-            <div style={{ height: '150px', backgroundColor: '#e2e8f0', backgroundImage: `url(${images[0].url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-            <div style={{ padding: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <p style={{ fontWeight: '500', fontSize: '0.875rem' }}>Hero Banner 1</p>
-                <p style={{ fontSize: '0.75rem', color: 'gray' }}>{images[0].slot}</p>
-              </div>
-              <button className="btn btn-outline" style={{ padding: '0.25rem', color: 'red', border: 'none' }}><Trash2 size={16} /></button>
-            </div>
-          </div>
-          
-          {/* Empty Slot */}
-          <div style={{ border: '1px dashed var(--border)', borderRadius: 'var(--radius)', height: '210px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', color: 'gray', cursor: 'pointer' }}>
-            <ImageIcon size={32} style={{ marginBottom: '0.5rem', opacity: 0.5 }} />
-            <p style={{ fontSize: '0.875rem' }}>Add Hero Banner 2</p>
-          </div>
-
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
+          <Loader2 className="spinner" size={32} style={{ animation: 'spin 1s linear infinite' }} />
+          <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
         </div>
-      </div>
+      ) : mediaItems.length === 0 ? (
+        <div className="card" style={{ padding: '4rem', textAlign: 'center', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+          <ImageIcon size={48} style={{ margin: '0 auto 1rem auto', color: 'var(--muted)' }} />
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>No Media Uploaded</h3>
+          <p style={{ color: 'var(--muted)' }}>Images you upload for materials and site banners will appear here.</p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+          {mediaItems.map(media => (
+            <div key={media.id} className="card" style={{ overflow: 'hidden', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <div style={{ height: '180px', backgroundColor: 'var(--muted)', position: 'relative' }}>
+                {media.image_url ? (
+                  <img src={media.image_url} alt="Media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                    <ImageIcon size={32} color="white" />
+                  </div>
+                )}
+              </div>
+              <div style={{ padding: '1rem' }}>
+                <p style={{ fontWeight: '500', marginBottom: '0.25rem' }}>Slot: {media.slot_key}</p>
+                {media.categories?.name && (
+                  <p style={{ fontSize: '0.875rem', color: 'var(--muted)' }}>Category: {media.categories.name}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-  );
+  )
 }

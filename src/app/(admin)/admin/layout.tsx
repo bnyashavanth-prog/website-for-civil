@@ -1,42 +1,90 @@
-import Link from "next/link";
-import { LayoutDashboard, Image as ImageIcon, Package, Truck, Users, FileText, Settings } from "lucide-react";
+"use client"
+import React from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutDashboard, CalendarDays, Truck, Layers, Image as ImageIcon, LogOut } from 'lucide-react'
+import { createBrowserClient } from '@supabase/ssr'
 
-export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/admin-login')
+  }
+
+  const navItems = [
+    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Bookings', href: '/admin/bookings', icon: CalendarDays },
+    { name: 'Fleet Map', href: '/admin/fleet', icon: Truck },
+    { name: 'Materials', href: '/admin/categories', icon: Layers },
+    { name: 'Site Media', href: '/admin/media', icon: ImageIcon },
+  ]
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--background)' }}>
       {/* Sidebar */}
-      <aside style={{ width: '250px', backgroundColor: 'var(--card)', borderRight: '1px solid var(--border)', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: '2rem', padding: '0.5rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)' }}>SS Build Admin</h2>
-          <p style={{ fontSize: '0.75rem', color: 'gray' }}>Operations Portal</p>
+      <aside style={{
+        width: '250px',
+        backgroundColor: 'var(--card)',
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)' }}>SS Build Admin</h1>
         </div>
         
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Link href="/admin" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            <LayoutDashboard size={18} style={{ marginRight: '0.75rem' }} /> Dashboard
-          </Link>
-          <Link href="/admin/bookings" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            <FileText size={18} style={{ marginRight: '0.75rem' }} /> Bookings
-          </Link>
-          <Link href="/admin/fleet" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            <Truck size={18} style={{ marginRight: '0.75rem' }} /> Fleet Map
-          </Link>
-          <Link href="/admin/categories" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            <Package size={18} style={{ marginRight: '0.75rem' }} /> Materials
-          </Link>
-          <Link href="/admin/media" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            <ImageIcon size={18} style={{ marginRight: '0.75rem' }} /> Site Media
-          </Link>
-          <Link href="/admin/users" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            <Users size={18} style={{ marginRight: '0.75rem' }} /> Staff & Drivers
-          </Link>
+        <nav style={{ padding: '1rem', flex: 1 }}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              const Icon = item.icon
+              return (
+                <li key={item.name}>
+                  <Link href={item.href} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '0.75rem 1rem',
+                    borderRadius: 'var(--radius)',
+                    textDecoration: 'none',
+                    color: isActive ? 'white' : 'inherit',
+                    backgroundColor: isActive ? 'var(--primary)' : 'transparent',
+                    fontWeight: isActive ? 500 : 400,
+                  }}>
+                    <Icon size={20} />
+                    {item.name}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
         </nav>
 
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-           <Link href="/admin/settings" className="btn btn-outline" style={{ width: '100%', justifyContent: 'flex-start', border: 'none' }}>
-            <Settings size={18} style={{ marginRight: '0.75rem' }} /> Settings
-          </Link>
-          <button className="btn btn-outline" style={{ width: '100%', justifyContent: 'flex-start', border: 'none', color: 'red', marginTop: '0.5rem' }}>
+        <div style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
+          <button 
+            onClick={handleLogout}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem 1rem',
+              width: '100%',
+              borderRadius: 'var(--radius)',
+              border: 'none',
+              backgroundColor: 'transparent',
+              color: 'inherit',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+          >
+            <LogOut size={20} />
             Logout
           </button>
         </div>
@@ -47,5 +95,5 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         {children}
       </main>
     </div>
-  );
+  )
 }

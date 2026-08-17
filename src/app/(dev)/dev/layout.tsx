@@ -1,7 +1,21 @@
+"use client";
 import Link from "next/link";
-import { Server, Users, AlertTriangle, Settings, HardHat } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Server, Users, AlertTriangle, HardHat } from "lucide-react";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function DeveloperLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/developer-console');
+  };
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#020617', color: '#f8fafc' }}>
       {/* Sidebar */}
@@ -26,7 +40,7 @@ export default function DeveloperLayout({ children }: { children: React.ReactNod
         </nav>
 
         <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #1e293b' }}>
-          <button className="btn" style={{ width: '100%', justifyContent: 'flex-start', color: '#ef4444', padding: '0.75rem' }}>
+          <button onClick={handleLogout} className="btn" style={{ width: '100%', justifyContent: 'flex-start', color: '#ef4444', padding: '0.75rem' }}>
             Logout
           </button>
         </div>
