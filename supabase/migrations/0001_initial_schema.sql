@@ -23,11 +23,11 @@ CREATE TABLE public.user_profiles (
 );
 
 -- RLS Helper Functions
-CREATE OR REPLACE FUNCTION auth.current_tenant_id() RETURNS UUID AS $$
+CREATE OR REPLACE FUNCTION public.current_tenant_id() RETURNS UUID AS $$
   SELECT tenant_id FROM public.user_profiles WHERE id = auth.uid();
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION auth.current_user_role() RETURNS TEXT AS $$
+CREATE OR REPLACE FUNCTION public.current_user_role() RETURNS TEXT AS $$
   SELECT role FROM public.user_profiles WHERE id = auth.uid();
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
@@ -158,45 +158,45 @@ ALTER TABLE public.error_logs ENABLE ROW LEVEL SECURITY;
 
 -- 1. Tenants Table Policies
 CREATE POLICY "Developers can see all tenants" ON public.tenants
-  FOR ALL USING (auth.current_user_role() = 'developer');
+  FOR ALL USING (public.current_user_role() = 'developer');
 
 CREATE POLICY "Users can view their own tenant" ON public.tenants
-  FOR SELECT USING (id = auth.current_tenant_id());
+  FOR SELECT USING (id = public.current_tenant_id());
 
 -- 2. User Profiles Policies
 CREATE POLICY "Users can view users in same tenant" ON public.user_profiles
-  FOR SELECT USING (tenant_id = auth.current_tenant_id() OR auth.current_user_role() = 'developer');
+  FOR SELECT USING (tenant_id = public.current_tenant_id() OR public.current_user_role() = 'developer');
 
 CREATE POLICY "Users can update their own profile" ON public.user_profiles
   FOR UPDATE USING (id = auth.uid());
 
 -- Categories
 CREATE POLICY "Tenant isolation for categories" ON public.categories
-  FOR ALL USING (tenant_id = auth.current_tenant_id() OR auth.current_user_role() = 'developer');
+  FOR ALL USING (tenant_id = public.current_tenant_id() OR public.current_user_role() = 'developer');
 
 -- Subcategories
 CREATE POLICY "Tenant isolation for subcategories" ON public.subcategories
-  FOR ALL USING (tenant_id = auth.current_tenant_id() OR auth.current_user_role() = 'developer');
+  FOR ALL USING (tenant_id = public.current_tenant_id() OR public.current_user_role() = 'developer');
 
 -- Trucks
 CREATE POLICY "Tenant isolation for trucks" ON public.trucks
-  FOR ALL USING (tenant_id = auth.current_tenant_id() OR auth.current_user_role() = 'developer');
+  FOR ALL USING (tenant_id = public.current_tenant_id() OR public.current_user_role() = 'developer');
 
 -- Bookings (Customers only see their own, Admins see all in tenant)
 CREATE POLICY "Customers see own bookings, admins see tenant bookings" ON public.bookings
   FOR ALL USING (
-    (tenant_id = auth.current_tenant_id() AND customer_id = auth.uid()) OR
-    (tenant_id = auth.current_tenant_id() AND auth.current_user_role() IN ('operations', 'super_admin', 'accounts')) OR
-    auth.current_user_role() = 'developer'
+    (tenant_id = public.current_tenant_id() AND customer_id = auth.uid()) OR
+    (tenant_id = public.current_tenant_id() AND public.current_user_role() IN ('operations', 'super_admin', 'accounts')) OR
+    public.current_user_role() = 'developer'
   );
 
 -- Trips
 CREATE POLICY "Tenant isolation for trips" ON public.trips
-  FOR ALL USING (tenant_id = auth.current_tenant_id() OR auth.current_user_role() = 'developer');
+  FOR ALL USING (tenant_id = public.current_tenant_id() OR public.current_user_role() = 'developer');
 
 -- GPS Locations
 CREATE POLICY "Tenant isolation for GPS" ON public.gps_locations
-  FOR ALL USING (tenant_id = auth.current_tenant_id() OR auth.current_user_role() = 'developer');
+  FOR ALL USING (tenant_id = public.current_tenant_id() OR public.current_user_role() = 'developer');
 
 -- Site Media
 CREATE POLICY "Public read for site media" ON public.site_media
@@ -204,10 +204,10 @@ CREATE POLICY "Public read for site media" ON public.site_media
 
 CREATE POLICY "Admins can manage site media" ON public.site_media
   FOR ALL USING (
-    (tenant_id = auth.current_tenant_id() AND auth.current_user_role() IN ('operations', 'super_admin')) OR
-    auth.current_user_role() = 'developer'
+    (tenant_id = public.current_tenant_id() AND public.current_user_role() IN ('operations', 'super_admin')) OR
+    public.current_user_role() = 'developer'
   );
 
 -- Error Logs (Developers only)
 CREATE POLICY "Only developers can access error logs" ON public.error_logs
-  FOR ALL USING (auth.current_user_role() = 'developer');
+  FOR ALL USING (public.current_user_role() = 'developer');
