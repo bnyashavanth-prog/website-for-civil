@@ -14,6 +14,7 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true)
   const [bookings, setBookings] = useState<any[]>([])
   const [filter, setFilter] = useState('all')
+  const [prices, setPrices] = useState<Record<string, string>>({})
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -41,11 +42,16 @@ export default function BookingsPage() {
     fetchBookings()
   }, [filter])
 
-  const updateBookingStatus = async (id: string, status: string) => {
+  const updateBookingStatus = async (id: string, status: string, price?: string) => {
     try {
+      const updateData: any = { status }
+      if (price !== undefined) {
+        updateData.estimated_price = price ? parseFloat(price) : null
+      }
+
       await supabase
         .from('bookings')
-        .update({ status })
+        .update(updateData)
         .eq('id', id)
         .eq('tenant_id', TENANT_ID)
       
@@ -124,11 +130,19 @@ export default function BookingsPage() {
                 </p>
               </div>
               
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                {booking.status === 'pending' && (
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                {booking.status === 'pending' ? (
                   <>
+                    <input 
+                      type="number" 
+                      placeholder="Price (₹)" 
+                      className="input" 
+                      value={prices[booking.id] || ''} 
+                      onChange={(e) => setPrices(prev => ({...prev, [booking.id]: e.target.value}))}
+                      style={{ width: '120px' }}
+                    />
                     <button 
-                      onClick={() => updateBookingStatus(booking.id, 'confirmed')}
+                      onClick={() => updateBookingStatus(booking.id, 'confirmed', prices[booking.id])}
                       className="btn btn-primary"
                       style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius)', backgroundColor: '#10b981', color: 'white', border: 'none', cursor: 'pointer' }}
                     >
@@ -142,6 +156,10 @@ export default function BookingsPage() {
                       <X size={16} /> Reject
                     </button>
                   </>
+                ) : (
+                  <div style={{ fontWeight: 'bold' }}>
+                    {booking.estimated_price ? `₹${booking.estimated_price}` : 'No price set'}
+                  </div>
                 )}
               </div>
             </div>

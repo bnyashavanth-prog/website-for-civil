@@ -33,24 +33,28 @@ export async function middleware(request: NextRequest) {
 
   const url = request.nextUrl.clone()
 
-  // Example basic route guarding logic:
-  
+  let userRole = null;
+  if (user) {
+      const { data: profile } = await supabase.from('user_profiles').select('role').eq('id', user.id).single();
+      if (profile) {
+          userRole = profile.role;
+      }
+  }
+
   // 1. Developer Console
-  if (request.nextUrl.pathname.startsWith('/developer-console') && request.nextUrl.pathname !== '/developer-console') {
-     if (!user) {
+  if (request.nextUrl.pathname.startsWith('/dev') && request.nextUrl.pathname !== '/developer-console') {
+     if (!user || userRole !== 'developer') {
          url.pathname = '/developer-console'
          return NextResponse.redirect(url)
      }
-     // In a real app, also fetch user_profile role to ensure role === 'developer'
   }
 
   // 2. Admin Portal
   if (request.nextUrl.pathname.startsWith('/admin') && request.nextUrl.pathname !== '/admin-login') {
-      if (!user) {
+      if (!user || !['operations', 'super_admin', 'accounts'].includes(userRole as string)) {
           url.pathname = '/admin-login'
           return NextResponse.redirect(url)
       }
-      // Check role IN ('operations', 'super_admin', 'accounts')
   }
 
   // 3. Customer Portal (Booking & Tracking)
