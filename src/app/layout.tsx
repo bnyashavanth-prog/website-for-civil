@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-heading" });
 
 export const metadata: Metadata = {
-  title: "SS Build Platform",
-  description: "Materials and Transport Booking Platform",
+  title: "SS Build Private Limited",
+  description: "BUILD MORE. WE DELIVER THE REST. Construction materials and reliable truck delivery, managed from one powerful platform.",
 };
 
 export default function RootLayout({
@@ -16,7 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.variable} ${spaceGrotesk.variable}`}>
+        {children}
+      </body>
     </html>
   );
 }

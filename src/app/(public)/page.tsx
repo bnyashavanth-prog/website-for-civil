@@ -1,110 +1,113 @@
 "use client";
+
 import Link from "next/link";
-import { ArrowRight, Truck, ShieldCheck, MapPin } from "lucide-react";
+import { HardHat, Truck, MapPin, Package, ArrowRight, ShieldCheck, Activity } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 export default function Home() {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+
+  const truckX = useTransform(scrollYProgress, [0, 1], ["0%", "80vw"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
   return (
-    <div>
-      {/* Hero Section */}
-      <section style={{ 
-        position: 'relative', 
-        height: '85vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        backgroundImage: 'linear-gradient(rgba(2, 6, 23, 0.7), rgba(2, 6, 23, 0.7)), url("https://images.unsplash.com/photo-1541888081622-2646271c61be?q=80&w=1920")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        color: 'white',
-        textAlign: 'center',
-        padding: '0 2rem'
-      }}>
-        <div style={{ maxWidth: '800px' }}>
-          <h1 style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '1.5rem', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-            Building the Future, <span style={{ color: 'var(--accent)' }}>One Load at a Time.</span>
-          </h1>
-          <p style={{ fontSize: '1.25rem', marginBottom: '2.5rem', color: '#cbd5e1', lineHeight: 1.6 }}>
-            Premium quality sand, aggregate, and tar delivered directly to your site. Manage your logistics with our fleet of 150+ heavy-duty trucks.
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            <Link href="/booking" className="btn btn-accent" style={{ padding: '1rem 2rem', fontSize: '1.125rem' }}>
-              Book Materials <ArrowRight size={20} style={{ marginLeft: '0.5rem' }}/>
-            </Link>
-            <Link href="/booking/truck" className="btn btn-outline" style={{ padding: '1rem 2rem', fontSize: '1.125rem', color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}>
-              Hire a Truck
-            </Link>
-          </div>
-        </div>
-      </section>
+    <div className="ss-grid" style={{ minHeight: '100vh', width: '100%', position: 'relative', overflow: 'hidden' }}>
+      
+      {/* Background Ambient Glow */}
+      <div style={{ position: 'absolute', top: '-20%', left: '10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255, 176, 32, 0.05) 0%, rgba(8, 11, 16, 0) 70%)', zIndex: 0 }}></div>
+      <div style={{ position: 'absolute', top: '40%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(37, 217, 255, 0.03) 0%, rgba(8, 11, 16, 0) 70%)', zIndex: 0 }}></div>
 
-      {/* Materials Showcase (Products) */}
-      <section id="materials" style={{ padding: '6rem 2rem', backgroundColor: 'var(--background)' }}>
+      <div ref={containerRef} style={{ position: 'relative', zIndex: 10, paddingTop: '8rem', paddingBottom: '4rem' }}>
+        
+        {/* HERO SECTION */}
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            style={{ maxWidth: '800px' }}
+          >
+            <h1 className="heading-font" style={{ fontSize: '4.5rem', fontWeight: 'bold', lineHeight: 1.1, marginBottom: '1.5rem', textTransform: 'uppercase' }}>
+              <span style={{ color: 'var(--text-primary)' }}>Build More.</span><br/>
+              <span style={{ color: 'var(--accent-amber)' }}>We Deliver The Rest.</span>
+            </h1>
+            <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '3rem', maxWidth: '600px', lineHeight: 1.6 }}>
+              Construction materials and reliable truck delivery, managed from one powerful platform.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <Link href="/booking" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1rem' }}>
+                Book Materials <ArrowRight size={20} style={{ marginLeft: '0.5rem' }}/>
+              </Link>
+              <Link href="/booking/truck" className="btn btn-outline" style={{ padding: '1rem 2rem', fontSize: '1rem', borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}>
+                Book A Truck
+              </Link>
+              <Link href="/track" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', padding: '1rem', textTransform: 'uppercase', fontSize: '0.875rem', fontWeight: 'bold', letterSpacing: '0.05em' }}>
+                <Activity size={18} className="live-indicator" style={{ color: 'var(--accent-cyan)', borderRadius: '50%' }} />
+                Track Delivery
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* CINEMATIC TRUCK ANIMATION */}
+        <div style={{ height: '300px', position: 'relative', marginTop: '4rem', borderTop: '1px solid rgba(255,176,32,0.1)', borderBottom: '1px solid rgba(255,176,32,0.1)', backgroundColor: 'rgba(15, 20, 27, 0.5)' }}>
+           
+           <motion.div style={{ x: truckX, position: 'absolute', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 }}>
+              <div style={{ padding: '0.5rem 1rem', backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--accent-amber)', borderRadius: '4px', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', boxShadow: '0 4px 20px rgba(255,176,32,0.1)' }}>
+                 <div style={{ fontSize: '0.75rem', color: 'var(--accent-amber)', fontWeight: 'bold', letterSpacing: '0.05em' }}>TRUCK SS-104</div>
+                 <div style={{ width: '4px', height: '4px', backgroundColor: 'var(--accent-cyan)', borderRadius: '50%' }} className="live-indicator"></div>
+                 <div className="number-font" style={{ fontSize: '0.75rem', color: 'var(--text-primary)' }}>ETA 32 MIN</div>
+              </div>
+              <Truck size={64} color="var(--accent-amber)" />
+              {/* Ground shadow/line */}
+              <div style={{ width: '150px', height: '4px', background: 'radial-gradient(ellipse, rgba(255,176,32,0.4) 0%, transparent 70%)', marginTop: '0.5rem' }}></div>
+           </motion.div>
+
+           {/* Route line */}
+           <div style={{ position: 'absolute', top: 'calc(50% + 40px)', left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, var(--accent-cyan) 0%, transparent 100%)', opacity: 0.3 }}></div>
+        </div>
+
+      </div>
+
+      {/* SERVICES SECTION */}
+      <div id="services" style={{ padding: '6rem 2rem', backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem', color: 'var(--foreground)' }}>Premium Materials</h2>
-            <p style={{ color: 'gray', fontSize: '1.125rem', maxWidth: '600px', margin: '0 auto' }}>Sourced from the best quarries and delivered with unmatched reliability.</p>
-          </div>
+          <h2 className="heading-font" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '3rem', textAlign: 'center', textTransform: 'uppercase' }}>
+            Everything you need to keep building.
+          </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-            {/* Material Card 1 */}
-            <div className="card" style={{ padding: 0, overflow: 'hidden', border: 'none', transition: 'transform 0.3s ease', cursor: 'pointer' }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-10px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'none'}>
-              <div style={{ height: '220px', backgroundImage: 'url("https://images.unsplash.com/photo-1625624792612-4217fa52994e?q=80&w=600")', backgroundSize: 'cover' }}></div>
-              <div style={{ padding: '1.5rem', backgroundColor: 'var(--card)' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>M-Sand & P-Sand</h3>
-                <p style={{ color: 'gray', fontSize: '0.875rem', marginBottom: '1rem' }}>High quality manufactured sand ideal for concrete and plastering.</p>
-                <span style={{ fontWeight: '600', color: 'var(--primary)' }}>From ₹1,200 / Ton</span>
-              </div>
-            </div>
-
-            {/* Material Card 2 */}
-            <div className="card" style={{ padding: 0, overflow: 'hidden', border: 'none', transition: 'transform 0.3s ease', cursor: 'pointer' }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-10px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'none'}>
-              <div style={{ height: '220px', backgroundImage: 'url("https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?q=80&w=600")', backgroundSize: 'cover' }}></div>
-              <div style={{ padding: '1.5rem', backgroundColor: 'var(--card)' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Aggregates (Stone)</h3>
-                <p style={{ color: 'gray', fontSize: '0.875rem', marginBottom: '1rem' }}>20mm, 40mm crushed stone aggregates for strong foundations.</p>
-                <span style={{ fontWeight: '600', color: 'var(--primary)' }}>From ₹950 / Ton</span>
-              </div>
-            </div>
-
-            {/* Material Card 3 */}
-            <div className="card" style={{ padding: 0, overflow: 'hidden', border: 'none', transition: 'transform 0.3s ease', cursor: 'pointer' }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-10px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'none'}>
-              <div style={{ height: '220px', backgroundImage: 'url("https://images.unsplash.com/photo-1590479152345-4293f9c6f2a5?q=80&w=600")', backgroundSize: 'cover' }}></div>
-              <div style={{ padding: '1.5rem', backgroundColor: 'var(--card)' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Bitumen & Tar</h3>
-                <p style={{ color: 'gray', fontSize: '0.875rem', marginBottom: '1rem' }}>Premium road construction materials heated and delivered on-site.</p>
-                <span style={{ fontWeight: '600', color: 'var(--primary)' }}>From ₹3,400 / Ton</span>
-              </div>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+            {[
+              { icon: <Package size={32} color="var(--accent-amber)"/>, title: "Material Supply", desc: "Order construction materials with transparent quantities and pricing." },
+              { icon: <Truck size={32} color="var(--accent-cyan)"/>, title: "Truck Delivery", desc: "Request the right truck capacity for your specific delivery needs." },
+              { icon: <MapPin size={32} color="var(--success)"/>, title: "Live Tracking", desc: "Know exactly where your delivery is in real-time." },
+              { icon: <ShieldCheck size={32} color="var(--accent-amber)"/>, title: "Business Management", desc: "Manage bookings, invoices, and delivery history in one place." }
+            ].map((service, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                className="card"
+                style={{ cursor: 'pointer' }}
+                whileHover={{ y: -5, borderColor: 'var(--border-highlight)' }}
+              >
+                <div style={{ marginBottom: '1.5rem' }}>{service.icon}</div>
+                <h3 className="heading-font" style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', letterSpacing: '0.05em' }}>{service.title}</h3>
+                <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '0.875rem' }}>{service.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Services Features */}
-      <section id="services" style={{ padding: '6rem 2rem', backgroundColor: '#f1f5f9' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
-          <div>
-            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'rgba(30, 58, 138, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', color: 'var(--primary)' }}>
-              <Truck size={32} />
-            </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>150+ Fleet Capacity</h3>
-            <p style={{ color: 'gray', lineHeight: 1.6 }}>Our massive fleet of 10, 14, and 16-wheelers ensures we can handle projects of any scale without delays.</p>
-          </div>
-          <div>
-            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'rgba(217, 119, 6, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', color: 'var(--accent)' }}>
-              <MapPin size={32} />
-            </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Live GPS Tracking</h3>
-            <p style={{ color: 'gray', lineHeight: 1.6 }}>Track your materials from quarry to site in real-time through our state-of-the-art customer portal.</p>
-          </div>
-          <div>
-            <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'rgba(22, 163, 74, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', color: '#16a34a' }}>
-              <ShieldCheck size={32} />
-            </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Verified Quality</h3>
-            <p style={{ color: 'gray', lineHeight: 1.6 }}>Every load is weighed and quality-checked. Transparent invoicing and secure payment gateways.</p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
