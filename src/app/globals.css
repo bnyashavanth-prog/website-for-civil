@@ -156,3 +156,12 @@ h1, h2, h3, h4, h5, h6, .heading-font {
 .live-indicator {
   animation: pulse-cyan 2s infinite;
 }
+
+/* Nav Link Hover */
+.nav-link {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+.nav-link:hover {
+  color: var(--accent-amber);
+}

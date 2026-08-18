@@ -16,9 +16,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <span className="heading-font">SS BUILD</span>
         </Link>
         <nav style={{ display: 'flex', gap: '2rem', fontWeight: '500', fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          <Link href="/#services" style={{ padding: '0.5rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-amber)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Services</Link>
-          <Link href="/#materials" style={{ padding: '0.5rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-amber)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Materials</Link>
-          <Link href="/track" style={{ padding: '0.5rem', color: 'var(--text-secondary)', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-amber)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Track Order</Link>
+          <Link href="/#services" className="nav-link" style={{ padding: '0.5rem' }}>Services</Link>
+          <Link href="/#materials" className="nav-link" style={{ padding: '0.5rem' }}>Materials</Link>
+          <Link href="/track" className="nav-link" style={{ padding: '0.5rem' }}>Track Order</Link>
         </nav>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <Link href="/login" className="btn btn-outline">Login</Link>
@@ -44,11 +44,11 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </div>
           <div>
             <h4 className="heading-font" style={{ fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.05em' }}>PLATFORM</h4>
-            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-              <li><Link href="/" style={{ transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-amber)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Home</Link></li>
-              <li><Link href="/booking" style={{ transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-amber)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Book Materials</Link></li>
-              <li><Link href="/track" style={{ transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-amber)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Track Delivery</Link></li>
-              <li><Link href="/admin-login" style={{ transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-amber)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Staff Portal</Link></li>
+            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem' }}>
+              <li><Link href="/" className="nav-link">Home</Link></li>
+              <li><Link href="/booking" className="nav-link">Book Materials</Link></li>
+              <li><Link href="/track" className="nav-link">Track Delivery</Link></li>
+              <li><Link href="/admin-login" className="nav-link">Staff Portal</Link></li>
             </ul>
           </div>
           <div>
