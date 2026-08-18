@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { ArrowRight, MapPin, Calendar, CheckCircle } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, MapPin, Calendar, CheckCircle, Package } from "lucide-react";
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from "next/navigation";
 
@@ -39,7 +39,6 @@ export default function MaterialBooking() {
         return;
       }
 
-      // Hardcode tenant_id since we are on the single-tenant SS Build platform
       const tenantId = '00000000-0000-0000-0000-000000000001';
       
       const { error: insertError } = await supabase.from('bookings').insert({
@@ -50,7 +49,6 @@ export default function MaterialBooking() {
         delivery_location: formData.location,
         delivery_date: formData.date,
         status: 'pending'
-        // estimated_price is null
       });
 
       if (insertError) {
@@ -68,31 +66,34 @@ export default function MaterialBooking() {
   }
 
   return (
-    <div style={{ padding: '4rem 2rem', backgroundColor: '#f1f5f9', minHeight: '80vh' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem', textAlign: 'center' }}>Book Materials</h1>
+    <div style={{ padding: '4rem 2rem', backgroundColor: 'var(--bg-base)', minHeight: '100vh' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
         
-        {/* Progress Bar */}
+        <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '500', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            <Package size={24} color="var(--accent-amber)" /> Book Material
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Submit your requirements for material and transport</p>
+        </div>
+        
+        {/* Flat Progress Indicator */}
         {step < 4 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3rem', position: 'relative' }}>
-             <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '2px', backgroundColor: 'var(--border)', zIndex: 0 }}></div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
              {[1, 2, 3].map((s) => (
                <div key={s} style={{ 
-                 width: '32px', height: '32px', borderRadius: '50%', 
-                 backgroundColor: step >= s ? 'var(--primary)' : 'var(--card)', 
-                 color: step >= s ? 'white' : 'gray',
-                 border: `2px solid ${step >= s ? 'var(--primary)' : 'var(--border)'}`,
-                 display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, fontWeight: 'bold'
-               }}>
-                 {s}
-               </div>
+                 flex: 1, 
+                 height: '4px', 
+                 borderRadius: '2px', 
+                 backgroundColor: step >= s ? 'var(--accent-amber)' : 'var(--bg-surface)',
+                 transition: 'background-color 0.2s ease'
+               }}></div>
              ))}
           </div>
         )}
 
         <div className="card">
           {error && (
-            <div style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '0.75rem', borderRadius: '4px', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: '500' }}>
+            <div style={{ backgroundColor: 'rgba(248, 113, 113, 0.1)', border: '1px solid var(--status-danger)', color: 'var(--status-danger)', padding: '0.75rem', borderRadius: 'var(--radius-btn)', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: '500' }}>
               ⚠ {error}
             </div>
           )}
@@ -101,9 +102,9 @@ export default function MaterialBooking() {
             <form onSubmit={step === 3 ? handlePlaceOrder : handleNext} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {step === 1 && (
                 <>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>1. Select Material & Quantity</h2>
+                  <h2 style={{ fontSize: '1.125rem', fontWeight: '500' }}>1. Material Details</h2>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Material Category</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Material Category</label>
                     <select className="input" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
                       <option value="">-- Select Category --</option>
                       <option value="sand">Sand</option>
@@ -112,7 +113,7 @@ export default function MaterialBooking() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Specific Type</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Specific Type</label>
                     <select className="input" required value={formData.subcategory} onChange={e => setFormData({...formData, subcategory: e.target.value})}>
                       <option value="">-- Select Type --</option>
                       <option value="msand">M-Sand</option>
@@ -121,61 +122,76 @@ export default function MaterialBooking() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Quantity (Tons)</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Quantity (Tons)</label>
                     <input type="number" min="10" className="input" placeholder="e.g. 50" required value={formData.quantity} onChange={e => setFormData({...formData, quantity: e.target.value})} />
                   </div>
-                  <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end', marginTop: '1rem' }}>Next <ArrowRight size={18} style={{ marginLeft: '0.5rem' }}/></button>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                    <button type="submit" className="btn btn-primary">Next <ArrowRight size={16} style={{ marginLeft: '0.5rem' }}/></button>
+                  </div>
                 </>
               )}
 
               {step === 2 && (
                 <>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>2. Delivery Details</h2>
+                  <h2 style={{ fontSize: '1.125rem', fontWeight: '500' }}>2. Delivery Details</h2>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}><MapPin size={16} style={{ display: 'inline', marginRight: '0.25rem' }}/> Delivery Address</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-secondary)' }}><MapPin size={14} style={{ display: 'inline', marginRight: '0.25rem' }}/> Delivery Address</label>
                     <textarea className="input" rows={3} placeholder="Full site address..." required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}></textarea>
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}><Calendar size={16} style={{ display: 'inline', marginRight: '0.25rem' }}/> Delivery Date & Time</label>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-secondary)' }}><Calendar size={14} style={{ display: 'inline', marginRight: '0.25rem' }}/> Delivery Date & Time</label>
                     <input type="datetime-local" className="input" required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
                     <button type="button" className="btn btn-outline" onClick={() => setStep(1)}>Back</button>
-                    <button type="submit" className="btn btn-primary">Review <ArrowRight size={18} style={{ marginLeft: '0.5rem' }}/></button>
+                    <button type="submit" className="btn btn-primary">Review <ArrowRight size={16} style={{ marginLeft: '0.5rem' }}/></button>
                   </div>
                 </>
               )}
 
               {step === 3 && (
                 <>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>3. Confirm Order Details</h2>
-                  <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-                    <h3 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>Order Summary</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.875rem' }}>
-                      <p><span style={{ color: 'gray' }}>Material:</span><br/><b>{formData.subcategory || 'M-Sand'}</b></p>
-                      <p><span style={{ color: 'gray' }}>Quantity:</span><br/><b>{formData.quantity || '50'} Tons</b></p>
-                      <p><span style={{ color: 'gray' }}>Delivery:</span><br/><b>{formData.date || 'Tomorrow 10:00 AM'}</b></p>
-                      <p><span style={{ color: 'gray' }}>Location:</span><br/><b>{formData.location || 'Site A'}</b></p>
+                  <h2 style={{ fontSize: '1.125rem', fontWeight: '500' }}>3. Review Request</h2>
+                  <div style={{ backgroundColor: 'var(--bg-base)', padding: '1.25rem', borderRadius: 'var(--radius-btn)', border: '1px solid var(--border-hairline)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', fontSize: '0.875rem' }}>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)' }}>Material</span><br/>
+                        <span style={{ fontWeight: '500' }}>{formData.subcategory || 'M-Sand'}</span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)' }}>Quantity</span><br/>
+                        <span className="number-font">{formData.quantity || '50'} Tons</span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)' }}>Delivery</span><br/>
+                        <span className="number-font">{formData.date || 'Tomorrow 10:00 AM'}</span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)' }}>Location</span><br/>
+                        <span style={{ fontWeight: '500' }}>{formData.location || 'Site A'}</span>
+                      </div>
                     </div>
                   </div>
-                  <p style={{ color: 'gray', fontSize: '0.875rem', textAlign: 'center', marginTop: '1rem' }}>
-                    Your order will be sent to the operations team. They will review it and provide an estimated price for confirmation.
+                  <p style={{ color: 'var(--status-warning)', fontSize: '0.875rem', padding: '0.75rem', backgroundColor: 'rgba(242, 169, 84, 0.1)', borderRadius: 'var(--radius-btn)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    Upon submission, dispatch will review and provide a final price estimate.
                   </p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
                     <button type="button" className="btn btn-outline" onClick={() => setStep(2)}>Back</button>
-                    <button type="submit" className="btn btn-accent" disabled={loading}>
-                      {loading ? 'Submitting...' : 'Place Order'}
+                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                      {loading ? 'Submitting...' : 'Place Request'}
                     </button>
                   </div>
                 </>
               )}
             </form>
           ) : (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-               <CheckCircle size={64} color="#16a34a" style={{ margin: '0 auto', marginBottom: '1.5rem' }} />
-               <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Order Placed Successfully!</h2>
-               <p style={{ color: 'gray', marginBottom: '2rem' }}>Our team is reviewing your order. We will update it with the estimated price shortly.</p>
-               <button className="btn btn-primary" onClick={() => router.push('/dashboard')}>Go to Dashboard</button>
+            <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+               <CheckCircle size={48} color="var(--status-success)" style={{ margin: '0 auto', marginBottom: '1.5rem' }} />
+               <h2 style={{ fontSize: '1.25rem', fontWeight: '500', marginBottom: '0.75rem' }}>Request Submitted</h2>
+               <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                 Your material request has been securely routed to dispatch. We will assign a truck and estimate your pricing shortly.
+               </p>
+               <button className="btn btn-outline" onClick={() => router.push('/dashboard')}>Go to Dashboard</button>
             </div>
           )}
         </div>
