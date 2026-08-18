@@ -3,19 +3,19 @@ import { HardHat } from "lucide-react";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
-      {/* Premium Dark Header */}
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-base)' }}>
+      {/* Industrial Dark Header */}
       <header style={{ 
         position: 'sticky', top: 0, zIndex: 50, 
-        backgroundColor: 'rgba(8, 11, 16, 0.85)', backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--border)',
+        backgroundColor: 'rgba(30, 26, 20, 0.95)', backdropFilter: 'blur(10px)',
+        borderBottom: '0.5px solid var(--border-hairline)',
         padding: '1.25rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
       }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 'bold', fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
-          <HardHat size={28} color="var(--accent-amber)" />
-          <span className="heading-font">SS BUILD</span>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '500', fontSize: '1.125rem', color: 'var(--text-primary)' }}>
+          <HardHat size={24} color="var(--accent-amber)" />
+          <span>SS Build</span>
         </Link>
-        <nav style={{ display: 'flex', gap: '2rem', fontWeight: '500', fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <nav style={{ display: 'flex', gap: '2rem', fontWeight: '400', fontSize: '0.875rem' }}>
           <Link href="/#services" className="nav-link" style={{ padding: '0.5rem' }}>Services</Link>
           <Link href="/#materials" className="nav-link" style={{ padding: '0.5rem' }}>Materials</Link>
           <Link href="/track" className="nav-link" style={{ padding: '0.5rem' }}>Track Order</Link>
@@ -31,19 +31,19 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         {children}
       </main>
 
-      {/* Dark Footer */}
-      <footer style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', color: 'var(--text-primary)', padding: '4rem 2rem', marginTop: 'auto' }}>
+      {/* Flat Footer */}
+      <footer style={{ backgroundColor: 'var(--bg-surface)', borderTop: '0.5px solid var(--border-hairline)', color: 'var(--text-primary)', padding: '4rem 2rem', marginTop: 'auto' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '3rem' }}>
           <div>
-            <h3 className="heading-font" style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', letterSpacing: '0.05em' }}>
-              <HardHat size={24} color="var(--accent-amber)" /> SS BUILD PVT LTD
+            <h3 style={{ fontSize: '1.125rem', fontWeight: '500', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <HardHat size={20} color="var(--accent-amber)" /> SS Build Pvt Ltd
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.6 }}>
               Construction materials and reliable truck delivery, managed from one powerful platform.
             </p>
           </div>
           <div>
-            <h4 className="heading-font" style={{ fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.05em' }}>PLATFORM</h4>
+            <h4 style={{ fontWeight: '500', marginBottom: '1.25rem', color: 'var(--text-muted)' }}>Platform</h4>
             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem' }}>
               <li><Link href="/" className="nav-link">Home</Link></li>
               <li><Link href="/booking" className="nav-link">Book Materials</Link></li>
@@ -52,7 +52,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </ul>
           </div>
           <div>
-            <h4 className="heading-font" style={{ fontWeight: 'bold', marginBottom: '1.5rem', letterSpacing: '0.05em' }}>CONTACT</h4>
+            <h4 style={{ fontWeight: '500', marginBottom: '1.25rem', color: 'var(--text-muted)' }}>Contact</h4>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Email: contact@ssbuild.com</p>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Phone: +91 98765 43210</p>
           </div>
