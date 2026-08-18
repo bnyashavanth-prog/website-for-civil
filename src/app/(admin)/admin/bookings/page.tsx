@@ -61,6 +61,17 @@ export default function BookingsPage() {
     }
   }
 
+  const getStatusPill = (status: string) => {
+    const map: Record<string, string> = {
+      pending: 'status-warning',
+      confirmed: 'status-teal',
+      in_progress: 'status-warning',
+      delivered: 'status-success',
+      cancelled: 'status-danger',
+    }
+    return <span className={`status-pill ${map[status] || 'status-warning'}`}>{status}</span>
+  }
+
   const tabs = [
     { id: 'all', label: 'All' },
     { id: 'pending', label: 'Pending' },
@@ -71,11 +82,9 @@ export default function BookingsPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Bookings Management</h1>
-      </div>
+      <h1 style={{ fontSize: '1.25rem', fontWeight: '500', marginBottom: '2rem' }}>Bookings</h1>
 
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '2rem', borderBottom: '0.5px solid var(--border-hairline)' }}>
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -84,10 +93,12 @@ export default function BookingsPage() {
               padding: '0.75rem 1rem',
               background: 'none',
               border: 'none',
-              borderBottom: filter === tab.id ? '2px solid var(--primary)' : '2px solid transparent',
-              color: filter === tab.id ? 'var(--primary)' : 'inherit',
-              fontWeight: filter === tab.id ? 'bold' : 'normal',
-              cursor: 'pointer'
+              borderBottom: filter === tab.id ? '2px solid var(--accent-amber)' : '2px solid transparent',
+              color: filter === tab.id ? 'var(--text-primary)' : 'var(--text-muted)',
+              fontWeight: '500',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              transition: 'all 0.15s ease-out'
             }}
           >
             {tab.label}
@@ -97,73 +108,71 @@ export default function BookingsPage() {
 
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
-          <Loader2 className="spinner" size={32} style={{ animation: 'spin 1s linear infinite' }} />
+          <Loader2 size={32} color="var(--accent-amber)" style={{ animation: 'spin 1s linear infinite' }} />
           <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
         </div>
       ) : bookings.length === 0 ? (
-        <div className="card" style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <p style={{ color: 'var(--muted)', fontSize: '1.125rem' }}>No bookings found for this filter.</p>
+        <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>No bookings found for this filter.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          {bookings.map((booking) => (
-            <div key={booking.id} className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: 'bold' }}>ID: {booking.id.substring(0, 8)}</span>
-                  <span style={{ 
-                    padding: '0.25rem 0.5rem', 
-                    borderRadius: '999px', 
-                    fontSize: '0.75rem',
-                    textTransform: 'uppercase',
-                    backgroundColor: 'var(--accent)',
-                    color: 'white'
-                  }}>
-                    {booking.status}
-                  </span>
-                </div>
-                <p style={{ marginBottom: '0.25rem' }}>
-                  <strong>Customer:</strong> {booking.customer?.[0]?.first_name} {booking.customer?.[0]?.last_name} ({booking.customer?.[0]?.phone})
-                </p>
-                <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>
-                  Location: {booking.delivery_location} | Qty: {booking.quantity}
-                </p>
-              </div>
-              
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                {booking.status === 'pending' ? (
-                  <>
-                    <input 
-                      type="number" 
-                      placeholder="Price (₹)" 
-                      className="input" 
-                      value={prices[booking.id] || ''} 
-                      onChange={(e) => setPrices(prev => ({...prev, [booking.id]: e.target.value}))}
-                      style={{ width: '120px' }}
-                    />
-                    <button 
-                      onClick={() => updateBookingStatus(booking.id, 'confirmed', prices[booking.id])}
-                      className="btn btn-primary"
-                      style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius)', backgroundColor: '#10b981', color: 'white', border: 'none', cursor: 'pointer' }}
-                    >
-                      <Check size={16} /> Approve
-                    </button>
-                    <button 
-                      onClick={() => updateBookingStatus(booking.id, 'cancelled')}
-                      className="btn btn-outline"
-                      style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', cursor: 'pointer' }}
-                    >
-                      <X size={16} /> Reject
-                    </button>
-                  </>
-                ) : (
-                  <div style={{ fontWeight: 'bold' }}>
-                    {booking.estimated_price ? `₹${booking.estimated_price}` : 'No price set'}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="card" style={{ padding: '0' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '0.5px solid var(--border-hairline)' }}>
+                <th style={{ padding: '1rem 1.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>ID</th>
+                <th style={{ padding: '1rem 0.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Customer</th>
+                <th style={{ padding: '1rem 0.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Location</th>
+                <th style={{ padding: '1rem 0.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Qty</th>
+                <th style={{ padding: '1rem 0.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Status</th>
+                <th style={{ padding: '1rem 1.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((booking) => (
+                <tr key={booking.id} style={{ borderBottom: '0.5px solid var(--border-hairline)' }}>
+                  <td className="number-font" style={{ padding: '1rem 1.5rem', color: 'var(--amber-text)' }}>{booking.id.substring(0, 8)}</td>
+                  <td style={{ padding: '1rem 0.5rem' }}>
+                    <div>{booking.customer?.[0]?.first_name || '—'} {booking.customer?.[0]?.last_name || ''}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{booking.customer?.[0]?.phone || ''}</div>
+                  </td>
+                  <td style={{ padding: '1rem 0.5rem', color: 'var(--text-secondary)' }}>{booking.delivery_location || '—'}</td>
+                  <td className="number-font" style={{ padding: '1rem 0.5rem' }}>{booking.quantity || '—'}</td>
+                  <td style={{ padding: '1rem 0.5rem' }}>{getStatusPill(booking.status)}</td>
+                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                    {booking.status === 'pending' ? (
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        <input 
+                          type="number" 
+                          placeholder="₹ Price" 
+                          className="input" 
+                          value={prices[booking.id] || ''} 
+                          onChange={(e) => setPrices(prev => ({...prev, [booking.id]: e.target.value}))}
+                          style={{ width: '100px', padding: '0.5rem 0.75rem' }}
+                        />
+                        <button 
+                          onClick={() => updateBookingStatus(booking.id, 'confirmed', prices[booking.id])}
+                          style={{ padding: '0.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', borderRadius: 'var(--radius-btn)', backgroundColor: 'rgba(74, 222, 128, 0.15)', color: 'var(--status-success)', border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '0.75rem' }}
+                        >
+                          <Check size={14} /> Approve
+                        </button>
+                        <button 
+                          onClick={() => updateBookingStatus(booking.id, 'cancelled')}
+                          style={{ padding: '0.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', borderRadius: 'var(--radius-btn)', backgroundColor: 'rgba(248, 113, 113, 0.15)', color: 'var(--status-danger)', border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '0.75rem' }}
+                        >
+                          <X size={14} /> Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="number-font" style={{ fontWeight: '500' }}>
+                        {booking.estimated_price ? `₹${booking.estimated_price}` : '—'}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

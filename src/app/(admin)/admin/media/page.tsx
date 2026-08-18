@@ -37,44 +37,43 @@ export default function MediaPage() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Site Media</h1>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: '500' }}>Site Media</h1>
         <button 
           className="btn btn-primary"
-          style={{ padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius)', backgroundColor: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer' }}
-          onClick={() => alert("Image upload requires setting up a Supabase Storage bucket first. Feature coming soon!")}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          onClick={() => alert("Image upload requires setting up a Supabase Storage bucket first.")}
         >
-          <Upload size={20} /> Upload Image
+          <Upload size={16} /> Upload
         </button>
       </div>
 
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
-          <Loader2 className="spinner" size={32} style={{ animation: 'spin 1s linear infinite' }} />
+          <Loader2 size={32} color="var(--accent-amber)" style={{ animation: 'spin 1s linear infinite' }} />
           <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
         </div>
       ) : mediaItems.length === 0 ? (
-        <div className="card" style={{ padding: '4rem', textAlign: 'center', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <ImageIcon size={48} style={{ margin: '0 auto 1rem auto', color: 'var(--muted)' }} />
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>No Media Uploaded</h3>
-          <p style={{ color: 'var(--muted)' }}>Images you upload for materials and site banners will appear here.</p>
+        <div className="card" style={{ padding: '4rem', textAlign: 'center' }}>
+          <ImageIcon size={32} style={{ margin: '0 auto 1rem auto', color: 'var(--text-muted)', opacity: 0.5 }} />
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>No media uploaded yet. Images for materials and banners will appear here.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
           {mediaItems.map(media => (
-            <div key={media.id} className="card" style={{ overflow: 'hidden', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-              <div style={{ height: '180px', backgroundColor: 'var(--muted)', position: 'relative' }}>
+            <div key={media.id} className="card" style={{ overflow: 'hidden', padding: 0 }}>
+              <div style={{ height: '160px', backgroundColor: 'var(--bg-base)', position: 'relative' }}>
                 {media.image_url ? (
                   <img src={media.image_url} alt="Media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                    <ImageIcon size={32} color="white" />
+                    <ImageIcon size={24} color="var(--text-muted)" />
                   </div>
                 )}
               </div>
               <div style={{ padding: '1rem' }}>
-                <p style={{ fontWeight: '500', marginBottom: '0.25rem' }}>Slot: {media.slot_key}</p>
+                <p style={{ fontWeight: '500', marginBottom: '0.25rem', fontSize: '0.875rem' }}>{media.slot_key}</p>
                 {media.categories?.name && (
-                  <p style={{ fontSize: '0.875rem', color: 'var(--muted)' }}>Category: {media.categories.name}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{media.categories.name}</p>
                 )}
               </div>
             </div>

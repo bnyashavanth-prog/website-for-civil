@@ -92,94 +92,101 @@ export default function CategoriesPage() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Materials & Categories</h1>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: '500' }}>Materials</h1>
         <button 
           onClick={() => setShowAdd(!showAdd)}
           className="btn btn-primary"
-          style={{ padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius)', backgroundColor: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
-          <Plus size={20} /> New Category
+          <Plus size={16} /> New Category
         </button>
       </div>
 
       {showAdd && (
-        <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Add Category</h2>
+        <div className="card" style={{ marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: '500', marginBottom: '1rem', color: 'var(--text-secondary)' }}>Add category</h2>
           <form onSubmit={handleAddCategory} style={{ display: 'flex', gap: '1rem' }}>
             <input 
               type="text" 
-              placeholder="Category Name (e.g. Aggregate)"
+              placeholder="Category name (e.g. Aggregate)"
               required 
+              className="input"
               value={newCatName}
               onChange={e => setNewCatName(e.target.value)}
-              style={{ flex: 1, padding: '0.75rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'inherit' }}
+              style={{ flex: 1 }}
             />
-            <button type="submit" style={{ padding: '0.75rem 1.5rem', borderRadius: 'var(--radius)', backgroundColor: '#10b981', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
-              Save
-            </button>
+            <button type="submit" className="btn btn-primary">Save</button>
           </form>
         </div>
       )}
 
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
-          <Loader2 className="spinner" size={32} style={{ animation: 'spin 1s linear infinite' }} />
+          <Loader2 size={32} color="var(--accent-amber)" style={{ animation: 'spin 1s linear infinite' }} />
           <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
         </div>
       ) : categories.length === 0 ? (
-        <div className="card" style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <p style={{ color: 'var(--muted)', fontSize: '1.125rem' }}>No categories found. Create one to organize materials.</p>
+        <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>No categories found. Create one to organize materials.</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {categories.map(cat => (
-            <div key={cat.id} className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              
-              {editingId === cat.id ? (
-                <div style={{ display: 'flex', gap: '1rem', flex: 1, marginRight: '2rem' }}>
-                  <input 
-                    type="text" 
-                    value={editName}
-                    onChange={e => setEditName(e.target.value)}
-                    style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'inherit' }}
-                  />
-                  <button 
-                    onClick={() => handleUpdateCategory(cat.id)}
-                    style={{ padding: '0.5rem', backgroundColor: '#10b981', color: 'white', borderRadius: 'var(--radius)', border: 'none', cursor: 'pointer' }}
-                  >
-                    <Check size={20} />
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{cat.name}</h3>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ 
-                  padding: '0.25rem 0.75rem', 
-                  borderRadius: '999px', 
-                  fontSize: '0.875rem',
-                  backgroundColor: cat.is_active ? '#10b98120' : '#ef444420',
-                  color: cat.is_active ? '#10b981' : '#ef4444',
-                  cursor: 'pointer'
-                }} onClick={() => toggleStatus(cat.id, cat.is_active)}>
-                  {cat.is_active ? 'Active' : 'Inactive'}
-                </span>
-                
-                <button 
-                  onClick={() => {
-                    setEditingId(cat.id)
-                    setEditName(cat.name)
-                  }}
-                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '0.25rem' }}
-                >
-                  <Edit2 size={18} />
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="card" style={{ padding: '0' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '0.5px solid var(--border-hairline)' }}>
+                <th style={{ padding: '1rem 1.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Category</th>
+                <th style={{ padding: '1rem 0.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Status</th>
+                <th style={{ padding: '1rem 1.5rem', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map(cat => (
+                <tr key={cat.id} style={{ borderBottom: '0.5px solid var(--border-hairline)', opacity: cat.is_active ? 1 : 0.6 }}>
+                  <td style={{ padding: '1rem 1.5rem' }}>
+                    {editingId === cat.id ? (
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <input 
+                          type="text" 
+                          className="input"
+                          value={editName}
+                          onChange={e => setEditName(e.target.value)}
+                          style={{ width: '200px', padding: '0.5rem 0.75rem' }}
+                        />
+                        <button 
+                          onClick={() => handleUpdateCategory(cat.id)}
+                          style={{ padding: '0.5rem', backgroundColor: 'rgba(74, 222, 128, 0.15)', color: 'var(--status-success)', borderRadius: 'var(--radius-btn)', border: 'none', cursor: 'pointer' }}
+                        >
+                          <Check size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ fontWeight: '500' }}>{cat.name}</span>
+                    )}
+                  </td>
+                  <td style={{ padding: '1rem 0.5rem' }}>
+                    <span 
+                      className={`status-pill ${cat.is_active ? 'status-success' : 'status-danger'}`}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => toggleStatus(cat.id, cat.is_active)}
+                    >
+                      {cat.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                    <button 
+                      onClick={() => {
+                        setEditingId(cat.id)
+                        setEditName(cat.name)
+                      }}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.25rem' }}
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

@@ -27,21 +27,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ]
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--background)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-base)' }}>
       {/* Sidebar */}
       <aside style={{
-        width: '250px',
-        backgroundColor: 'var(--card)',
-        borderRight: '1px solid var(--border)',
+        width: '260px',
+        backgroundColor: 'var(--bg-surface)',
+        borderRight: '0.5px solid var(--border-hairline)',
         display: 'flex',
         flexDirection: 'column'
       }}>
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)' }}>SS Build Admin</h1>
+        <div style={{ padding: '1.5rem', borderBottom: '0.5px solid var(--border-hairline)' }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: '500', color: 'var(--text-primary)' }}>SS Build Admin</h1>
         </div>
         
         <nav style={{ padding: '1rem', flex: 1 }}>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             {navItems.map((item) => {
               const isActive = pathname === item.href
               const Icon = item.icon
@@ -52,13 +52,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     alignItems: 'center',
                     gap: '0.75rem',
                     padding: '0.75rem 1rem',
-                    borderRadius: 'var(--radius)',
-                    textDecoration: 'none',
-                    color: isActive ? 'white' : 'inherit',
-                    backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-                    fontWeight: isActive ? 500 : 400,
-                  }}>
-                    <Icon size={20} />
+                    borderRadius: 'var(--radius-btn)',
+                    color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                    fontWeight: 500,
+                    transition: 'all 0.15s ease-out'
+                  }}
+                  onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--text-primary)' }}
+                  onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--text-secondary)' }}
+                  >
+                    <Icon size={18} color={isActive ? 'var(--accent-teal)' : 'currentColor'} />
                     {item.name}
                   </Link>
                 </li>
@@ -67,7 +70,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </ul>
         </nav>
 
-        <div style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
+        <div style={{ padding: '1rem', borderTop: '0.5px solid var(--border-hairline)' }}>
           <button 
             onClick={handleLogout}
             style={{
@@ -76,22 +79,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               gap: '0.75rem',
               padding: '0.75rem 1rem',
               width: '100%',
-              borderRadius: 'var(--radius)',
+              borderRadius: 'var(--radius-btn)',
               border: 'none',
               backgroundColor: 'transparent',
-              color: 'inherit',
+              color: 'var(--text-secondary)',
               cursor: 'pointer',
-              textAlign: 'left'
+              textAlign: 'left',
+              fontWeight: 500,
+              transition: 'all 0.15s ease-out'
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--status-danger)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)' }}
           >
-            <LogOut size={20} />
+            <LogOut size={18} />
             Logout
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+      <main style={{ flex: 1, padding: '2.5rem', overflowY: 'auto' }}>
         {children}
       </main>
     </div>

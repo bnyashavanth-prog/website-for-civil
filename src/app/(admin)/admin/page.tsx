@@ -26,21 +26,18 @@ export default function AdminDashboard() {
       setLoading(true)
       
       try {
-        // Active Trips
         const { count: activeTripsCount } = await supabase
           .from('trips')
           .select('*', { count: 'exact', head: true })
           .eq('tenant_id', TENANT_ID)
           .in('status', ['assigned', 'en_route', 'arrived'])
 
-        // Pending Bookings
         const { count: pendingBookingsCount } = await supabase
           .from('bookings')
           .select('*', { count: 'exact', head: true })
           .eq('tenant_id', TENANT_ID)
           .eq('status', 'pending')
 
-        // Available Trucks
         const { count: totalTrucksCount } = await supabase
           .from('trucks')
           .select('*', { count: 'exact', head: true })
@@ -52,7 +49,6 @@ export default function AdminDashboard() {
           .eq('tenant_id', TENANT_ID)
           .eq('status', 'available')
 
-        // Today's Revenue
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         
@@ -65,7 +61,6 @@ export default function AdminDashboard() {
           
         const revenue = revenueData?.reduce((sum, item) => sum + (Number(item.estimated_price) || 0), 0) || 0
 
-        // Recent Bookings
         const { data: recent } = await supabase
           .from('bookings')
           .select('*, customer:user_profiles!customer_id(first_name, last_name)')
@@ -95,76 +90,77 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Loader2 className="spinner" size={32} style={{ animation: 'spin 1s linear infinite' }} />
+        <Loader2 size={32} color="var(--accent-amber)" style={{ animation: 'spin 1s linear infinite' }} />
         <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
       </div>
     )
   }
 
+  const getStatusPill = (status: string) => {
+    const map: Record<string, string> = {
+      pending: 'status-warning',
+      confirmed: 'status-teal',
+      in_progress: 'status-warning',
+      delivered: 'status-success',
+      cancelled: 'status-danger',
+    }
+    return <span className={`status-pill ${map[status] || 'status-warning'}`}>{status}</span>
+  }
+
   const statCards = [
-    { title: 'Active Trips', value: stats.activeTrips, icon: Activity, color: '#3b82f6' },
-    { title: 'Pending Bookings', value: stats.pendingBookings, icon: Clock, color: '#f59e0b' },
-    { title: 'Available Trucks', value: `${stats.availableTrucks} / ${stats.totalTrucks}`, icon: Truck, color: '#10b981' },
-    { title: "Today's Revenue", value: `$${stats.todayRevenue.toFixed(2)}`, icon: DollarSign, color: '#8b5cf6' },
+    { title: 'Active trips', value: stats.activeTrips, icon: Activity, color: 'var(--accent-teal)' },
+    { title: 'Pending bookings', value: stats.pendingBookings, icon: Clock, color: 'var(--status-warning)' },
+    { title: 'Available trucks', value: `${stats.availableTrucks}/${stats.totalTrucks}`, icon: Truck, color: 'var(--accent-terracotta)' },
+    { title: "Today's revenue", value: `₹${stats.todayRevenue.toFixed(0)}`, icon: DollarSign, color: 'var(--status-success)' },
   ]
 
   return (
     <div>
-      <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '2rem' }}>Dashboard Overview</h1>
+      <h1 style={{ fontSize: '1.25rem', fontWeight: '500', marginBottom: '2rem' }}>Dashboard</h1>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
         {statCards.map((stat, i) => {
           const Icon = stat.icon
           return (
-            <div key={i} className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <p style={{ color: 'var(--muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{stat.title}</p>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stat.value}</h3>
-                </div>
-                <div style={{ padding: '0.75rem', backgroundColor: `${stat.color}20`, borderRadius: '0.5rem', color: stat.color }}>
-                  <Icon size={24} />
-                </div>
+            <div key={i} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.03em' }}>{stat.title}</p>
+                <h3 className="number-font" style={{ fontSize: '1.5rem', fontWeight: '500' }}>{stat.value}</h3>
+              </div>
+              <div style={{ padding: '0.625rem', backgroundColor: 'var(--bg-base)', borderRadius: 'var(--radius-btn)' }}>
+                <Icon size={18} color={stat.color} />
               </div>
             </div>
           )
         })}
       </div>
 
-      <div className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Recent Bookings</h2>
+      <div className="card">
+        <h2 style={{ fontSize: '1rem', fontWeight: '500', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Recent bookings</h2>
         
         {recentBookings.length === 0 ? (
-          <p style={{ color: 'var(--muted)', textAlign: 'center', padding: '2rem' }}>No bookings yet.</p>
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem', fontSize: '0.875rem' }}>No bookings yet.</p>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--muted)' }}>
-                <th style={{ padding: '1rem 0', fontWeight: '500' }}>ID</th>
-                <th style={{ padding: '1rem 0', fontWeight: '500' }}>Customer</th>
-                <th style={{ padding: '1rem 0', fontWeight: '500' }}>Date</th>
-                <th style={{ padding: '1rem 0', fontWeight: '500' }}>Status</th>
-                <th style={{ padding: '1rem 0', fontWeight: '500', textAlign: 'right' }}>Amount</th>
+              <tr style={{ borderBottom: '0.5px solid var(--border-hairline)' }}>
+                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>ID</th>
+                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Customer</th>
+                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Date</th>
+                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Status</th>
+                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'right' }}>Amount</th>
               </tr>
             </thead>
             <tbody>
               {recentBookings.map((booking) => (
-                <tr key={booking.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '1rem 0', fontFamily: 'monospace' }}>{booking.id.substring(0, 8)}</td>
-                  <td style={{ padding: '1rem 0' }}>{booking.customer?.[0]?.first_name} {booking.customer?.[0]?.last_name}</td>
-                  <td style={{ padding: '1rem 0' }}>{new Date(booking.created_at).toLocaleDateString()}</td>
-                  <td style={{ padding: '1rem 0' }}>
-                    <span style={{ 
-                      padding: '0.25rem 0.75rem', 
-                      borderRadius: '999px', 
-                      fontSize: '0.875rem',
-                      backgroundColor: booking.status === 'delivered' ? '#10b98120' : '#f59e0b20',
-                      color: booking.status === 'delivered' ? '#10b981' : '#f59e0b'
-                    }}>
-                      {booking.status}
-                    </span>
+                <tr key={booking.id} style={{ borderBottom: '0.5px solid var(--border-hairline)' }}>
+                  <td className="number-font" style={{ padding: '0.75rem 0', color: 'var(--amber-text)' }}>{booking.id.substring(0, 8)}</td>
+                  <td style={{ padding: '0.75rem 0' }}>{booking.customer?.[0]?.first_name || '—'} {booking.customer?.[0]?.last_name || ''}</td>
+                  <td className="number-font" style={{ padding: '0.75rem 0', color: 'var(--text-secondary)' }}>{new Date(booking.created_at).toLocaleDateString()}</td>
+                  <td style={{ padding: '0.75rem 0' }}>{getStatusPill(booking.status)}</td>
+                  <td className="number-font" style={{ padding: '0.75rem 0', textAlign: 'right' }}>
+                    {booking.estimated_price ? `₹${Number(booking.estimated_price).toFixed(0)}` : '—'}
                   </td>
-                  <td style={{ padding: '1rem 0', textAlign: 'right' }}>${Number(booking.estimated_price || 0).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
