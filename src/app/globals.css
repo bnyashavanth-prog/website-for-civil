@@ -1,5 +1,7 @@
 :root {
-  /* Industrial-Modern Dark Theme */
+  /* ═══════════════════════════════════════════════
+     FIG 1 — Warm Industrial Theme (Public Site)
+     ═══════════════════════════════════════════════ */
   --bg-base: #14110D;
   --bg-surface: #1E1A14;
   
@@ -27,7 +29,51 @@
   --radius-pill: 20px;
 }
 
-/* Force dark mode */
+/* ═══════════════════════════════════════════════
+   FIG 2 — Cool Command Center Theme (Admin)
+   Scoped to .theme-fig2 wrapper
+   ═══════════════════════════════════════════════ */
+.theme-fig2 {
+  --bg-base: #0B0E13;
+  --bg-surface: #12161D;
+  --bg-elevated: #182029;
+
+  --border-hairline: rgba(255, 255, 255, 0.07);
+
+  --text-primary: #EDEFF2;
+  --text-secondary: #8D97A5;
+  --text-muted: #5F6A78;
+
+  /* Copper (primary action) */
+  --accent-copper: #CC6A2E;
+  --copper-text: #E8955E;
+  --text-on-copper: #241000;
+
+  /* Slate Blue (fleet/admin structure) */
+  --accent-blue: #4C6EF5;
+
+  /* Cyan (live/GPS only) */
+  --accent-cyan: #22D3EE;
+  --cyan-text: #67E8F9;
+
+  --status-success: #34D399;
+  --status-warning: #E8955E;
+  --status-danger: #F87171;
+
+  /* Override shared tokens for admin */
+  --accent-amber: #CC6A2E;
+  --text-on-amber: #241000;
+  --amber-text: #E8955E;
+  --accent-teal: #22D3EE;
+  --teal-text: #67E8F9;
+
+  --radius-card: 14px;
+}
+
+/* ═══════════════════════════════════════════════
+   Global resets
+   ═══════════════════════════════════════════════ */
+
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);
@@ -50,9 +96,16 @@ a {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 500; /* Modern, not shouty */
+  font-weight: 500;
   color: var(--text-primary);
   line-height: 1.2;
+}
+
+/* Fig 2 headings are slightly bolder */
+.theme-fig2 h1,
+.theme-fig2 h2,
+.theme-fig2 h3 {
+  font-weight: 600;
 }
 
 .number-font {
@@ -60,8 +113,15 @@ h1, h2, h3, h4, h5, h6 {
   font-variant-numeric: tabular-nums;
 }
 
-/* Base UI Components (Sturdy, Flat) */
+.theme-fig2 .number-font {
+  font-weight: 600;
+}
 
+/* ═══════════════════════════════════════════════
+   Shared Component Patterns
+   ═══════════════════════════════════════════════ */
+
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -90,7 +150,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary:hover {
-  background-color: #F2A954;
+  filter: brightness(1.1);
 }
 
 .btn-outline {
@@ -103,16 +163,39 @@ h1, h2, h3, h4, h5, h6 {
   background-color: rgba(255, 255, 255, 0.03);
 }
 
-/* Flat surfaces, separation from background contrast only */
+/* Fig 2 secondary (slate blue) button */
+.theme-fig2 .btn-secondary {
+  background-color: var(--accent-blue);
+  color: #fff;
+  border: none;
+}
+
+.theme-fig2 .btn-secondary:hover {
+  filter: brightness(1.1);
+}
+
+/* Cards */
 .card {
   background-color: var(--bg-surface);
   color: var(--text-primary);
   border: 0.5px solid var(--border-hairline);
   border-radius: var(--radius-card);
   padding: 1.5rem;
-  box-shadow: none; /* No drop shadows */
+  box-shadow: none;
 }
 
+/* Elevated card (admin hover/active) */
+.theme-fig2 .card-elevated {
+  background-color: var(--bg-elevated);
+}
+
+/* Live card gets subtle inner glow in Fig 2 */
+.theme-fig2 .card-live {
+  box-shadow: inset 0 0 40px rgba(34, 211, 238, 0.04);
+  border-color: rgba(34, 211, 238, 0.15);
+}
+
+/* Inputs */
 .input {
   display: block;
   width: 100%;
@@ -130,6 +213,10 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--accent-amber);
 }
 
+.theme-fig2 .input:focus {
+  border-color: var(--accent-blue);
+}
+
 /* Nav Link Hover */
 .nav-link {
   color: var(--text-secondary);
@@ -139,7 +226,10 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
-/* Status Pills */
+/* ═══════════════════════════════════════════════
+   Status Pills (shared shape, both themes)
+   ═══════════════════════════════════════════════ */
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -151,21 +241,81 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .status-success {
-  background-color: rgba(74, 222, 128, 0.15);
+  background-color: rgba(52, 211, 153, 0.12);
   color: var(--status-success);
 }
 
 .status-warning {
-  background-color: rgba(242, 169, 84, 0.15);
+  background-color: rgba(232, 149, 94, 0.12);
   color: var(--status-warning);
 }
 
 .status-danger {
-  background-color: rgba(248, 113, 113, 0.15);
+  background-color: rgba(248, 113, 113, 0.12);
   color: var(--status-danger);
 }
 
 .status-teal {
-  background-color: rgba(45, 212, 191, 0.15);
+  background-color: rgba(34, 211, 238, 0.12);
   color: var(--teal-text);
+}
+
+/* Fig 2 slate-blue pill for fleet/admin */
+.status-blue {
+  background-color: rgba(76, 110, 245, 0.12);
+  color: var(--accent-blue);
+}
+
+/* ═══════════════════════════════════════════════
+   Fig 2 — KPI Stat Card (Command Center)
+   ═══════════════════════════════════════════════ */
+
+.kpi-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.kpi-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.25rem;
+}
+
+/* ═══════════════════════════════════════════════
+   Fig 2 — Pulsing live marker animation
+   ═══════════════════════════════════════════════ */
+
+@keyframes pulse-live {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(34, 211, 238, 0); }
+}
+
+.pulse-marker {
+  animation: pulse-live 2.5s ease-in-out infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { Activity, Clock, Truck, DollarSign, Loader2 } from 'lucide-react'
+import { Truck, MapPin, Clock, Wrench, Package, DollarSign, Loader2, AlertTriangle } from 'lucide-react'
 
 const TENANT_ID = '00000000-0000-0000-0000-000000000001'
 
@@ -13,10 +13,11 @@ export default function AdminDashboard() {
 
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
-    activeTrips: 0,
-    pendingBookings: 0,
-    availableTrucks: 0,
     totalTrucks: 0,
+    inTransit: 0,
+    available: 0,
+    maintenance: 0,
+    pendingBookings: 0,
     todayRevenue: 0,
   })
   const [recentBookings, setRecentBookings] = useState<any[]>([])
@@ -24,143 +25,194 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-      
       try {
-        const { count: activeTripsCount } = await supabase
-          .from('trips')
-          .select('*', { count: 'exact', head: true })
-          .eq('tenant_id', TENANT_ID)
-          .in('status', ['assigned', 'en_route', 'arrived'])
+        // Trucks
+        const { count: totalTrucks } = await supabase.from('trucks').select('*', { count: 'exact', head: true }).eq('tenant_id', TENANT_ID)
+        const { count: available } = await supabase.from('trucks').select('*', { count: 'exact', head: true }).eq('tenant_id', TENANT_ID).eq('status', 'available')
+        const { count: inTransit } = await supabase.from('trips').select('*', { count: 'exact', head: true }).eq('tenant_id', TENANT_ID).in('status', ['assigned', 'en_route'])
+        const { count: maintenance } = await supabase.from('trucks').select('*', { count: 'exact', head: true }).eq('tenant_id', TENANT_ID).eq('status', 'maintenance')
 
-        const { count: pendingBookingsCount } = await supabase
-          .from('bookings')
-          .select('*', { count: 'exact', head: true })
-          .eq('tenant_id', TENANT_ID)
-          .eq('status', 'pending')
+        // Bookings
+        const { count: pending } = await supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('tenant_id', TENANT_ID).eq('status', 'pending')
 
-        const { count: totalTrucksCount } = await supabase
-          .from('trucks')
-          .select('*', { count: 'exact', head: true })
-          .eq('tenant_id', TENANT_ID)
-          
-        const { count: availableTrucksCount } = await supabase
-          .from('trucks')
-          .select('*', { count: 'exact', head: true })
-          .eq('tenant_id', TENANT_ID)
-          .eq('status', 'available')
+        // Today revenue
+        const today = new Date(); today.setHours(0, 0, 0, 0)
+        const { data: revData } = await supabase.from('bookings').select('estimated_price').eq('tenant_id', TENANT_ID).eq('status', 'delivered').gte('created_at', today.toISOString())
+        const revenue = revData?.reduce((s, i) => s + (Number(i.estimated_price) || 0), 0) || 0
 
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        
-        const { data: revenueData } = await supabase
-          .from('bookings')
-          .select('estimated_price')
-          .eq('tenant_id', TENANT_ID)
-          .eq('status', 'delivered')
-          .gte('created_at', today.toISOString())
-          
-        const revenue = revenueData?.reduce((sum, item) => sum + (Number(item.estimated_price) || 0), 0) || 0
-
+        // Recent bookings
         const { data: recent } = await supabase
           .from('bookings')
           .select('*, customer:user_profiles!customer_id(first_name, last_name)')
           .eq('tenant_id', TENANT_ID)
           .order('created_at', { ascending: false })
-          .limit(5)
+          .limit(6)
 
-        setStats({
-          activeTrips: activeTripsCount || 0,
-          pendingBookings: pendingBookingsCount || 0,
-          availableTrucks: availableTrucksCount || 0,
-          totalTrucks: totalTrucksCount || 0,
-          todayRevenue: revenue,
-        })
+        setStats({ totalTrucks: totalTrucks || 0, inTransit: inTransit || 0, available: available || 0, maintenance: maintenance || 0, pendingBookings: pending || 0, todayRevenue: revenue })
         setRecentBookings(recent || [])
-
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error)
+      } catch (err) {
+        console.error(err)
       } finally {
         setLoading(false)
       }
     }
-
     fetchData()
   }, [])
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Loader2 size={32} color="var(--accent-amber)" style={{ animation: 'spin 1s linear infinite' }} />
-        <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <Loader2 size={32} color="#4C6EF5" style={{ animation: 'spin 1s linear infinite' }} />
       </div>
     )
   }
 
   const getStatusPill = (status: string) => {
-    const map: Record<string, string> = {
-      pending: 'status-warning',
-      confirmed: 'status-teal',
-      in_progress: 'status-warning',
-      delivered: 'status-success',
-      cancelled: 'status-danger',
-    }
-    return <span className={`status-pill ${map[status] || 'status-warning'}`}>{status}</span>
+    const map: Record<string, string> = { pending: 'status-warning', confirmed: 'status-blue', in_progress: 'status-warning', delivered: 'status-success', cancelled: 'status-danger' }
+    return <span className={`status-pill ${map[status] || 'status-warning'}`}>{status.replace('_', ' ')}</span>
   }
 
-  const statCards = [
-    { title: 'Active trips', value: stats.activeTrips, icon: Activity, color: 'var(--accent-teal)' },
-    { title: 'Pending bookings', value: stats.pendingBookings, icon: Clock, color: 'var(--status-warning)' },
-    { title: 'Available trucks', value: `${stats.availableTrucks}/${stats.totalTrucks}`, icon: Truck, color: 'var(--accent-terracotta)' },
-    { title: "Today's revenue", value: `₹${stats.todayRevenue.toFixed(0)}`, icon: DollarSign, color: 'var(--status-success)' },
+  const kpis = [
+    { label: 'Total trucks', value: stats.totalTrucks, icon: Truck, color: '#4C6EF5', bg: 'rgba(76, 110, 245, 0.12)' },
+    { label: 'In transit', value: stats.inTransit, icon: MapPin, color: '#22D3EE', bg: 'rgba(34, 211, 238, 0.12)' },
+    { label: 'Available', value: stats.available, icon: Clock, color: '#34D399', bg: 'rgba(52, 211, 153, 0.12)' },
+    { label: 'Maintenance', value: stats.maintenance, icon: Wrench, color: '#F87171', bg: 'rgba(248, 113, 113, 0.12)' },
+    { label: 'Pending orders', value: stats.pendingBookings, icon: Package, color: '#E8955E', bg: 'rgba(232, 149, 94, 0.12)' },
+    { label: "Today's revenue", value: `₹${stats.todayRevenue.toLocaleString()}`, icon: DollarSign, color: '#34D399', bg: 'rgba(52, 211, 153, 0.12)' },
   ]
 
   return (
     <div>
-      <h1 style={{ fontSize: '1.25rem', fontWeight: '500', marginBottom: '2rem' }}>Dashboard</h1>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
-        {statCards.map((stat, i) => {
-          const Icon = stat.icon
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.375rem', marginBottom: '0.25rem' }}>Command Center</h1>
+          <p style={{ color: '#5F6A78', fontSize: '0.8125rem' }}>Fleet operations overview</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 0.75rem', borderRadius: '20px', backgroundColor: 'rgba(34, 211, 238, 0.1)', border: '1px solid rgba(34, 211, 238, 0.2)' }}>
+          <div className="pulse-marker" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22D3EE' }}></div>
+          <span style={{ fontSize: '0.75rem', color: '#67E8F9', fontWeight: '600' }}>LIVE</span>
+        </div>
+      </div>
+
+      {/* KPI Row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.75rem', marginBottom: '2rem' }}>
+        {kpis.map((kpi, i) => {
+          const Icon = kpi.icon
           return (
-            <div key={i} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.03em' }}>{stat.title}</p>
-                <h3 className="number-font" style={{ fontSize: '1.5rem', fontWeight: '500' }}>{stat.value}</h3>
+            <div key={i} className="card kpi-card">
+              <div className="kpi-chip" style={{ backgroundColor: kpi.bg }}>
+                <Icon size={18} color={kpi.color} />
               </div>
-              <div style={{ padding: '0.625rem', backgroundColor: 'var(--bg-base)', borderRadius: 'var(--radius-btn)' }}>
-                <Icon size={18} color={stat.color} />
+              <div>
+                <div className="kpi-value" style={{ color: kpi.color }}>{kpi.value}</div>
+                <div className="kpi-label">{kpi.label}</div>
               </div>
             </div>
           )
         })}
       </div>
 
-      <div className="card">
-        <h2 style={{ fontSize: '1rem', fontWeight: '500', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Recent bookings</h2>
-        
+      {/* Two-column: Fleet Map + Alerts */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+        {/* Live Fleet Map Placeholder */}
+        <div className="card card-live" style={{ padding: 0, overflow: 'hidden' }}>
+          <div style={{ height: '320px', backgroundColor: '#0D1117', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* Simulated map background */}
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'radial-gradient(circle at 30% 40%, #4C6EF5 0%, transparent 50%), radial-gradient(circle at 70% 60%, #22D3EE 0%, transparent 40%)' }}></div>
+            
+            {/* Simulated truck markers */}
+            <div className="pulse-marker" style={{ position: 'absolute', top: '35%', left: '30%', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22D3EE' }}></div>
+            <div className="pulse-marker" style={{ position: 'absolute', top: '55%', left: '55%', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22D3EE' }}></div>
+            <div style={{ position: 'absolute', top: '45%', left: '70%', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#34D399' }}></div>
+
+            {/* Center label */}
+            <div style={{ zIndex: 1, textAlign: 'center' }}>
+              <Truck size={28} color="#5F6A78" />
+              <p style={{ color: '#5F6A78', fontSize: '0.8125rem', marginTop: '0.75rem', fontWeight: '500' }}>Live fleet map</p>
+              <p style={{ color: '#3A4250', fontSize: '0.6875rem', marginTop: '0.25rem' }}>GPS integration coming soon</p>
+            </div>
+          </div>
+          <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.75rem', color: '#5F6A78', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: '600' }}>Active routes</span>
+            <span className="number-font" style={{ fontSize: '0.875rem', color: '#67E8F9' }}>{stats.inTransit} tracking</span>
+          </div>
+        </div>
+
+        {/* Fleet Status & Alerts */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Fleet Status Donut Placeholder */}
+          <div className="card" style={{ flex: 1 }}>
+            <h3 style={{ fontSize: '0.8125rem', color: '#5F6A78', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '1.25rem' }}>Fleet Status</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {[
+                { label: 'Available', val: stats.available, color: '#34D399', total: stats.totalTrucks },
+                { label: 'In Transit', val: stats.inTransit, color: '#22D3EE', total: stats.totalTrucks },
+                { label: 'Maintenance', val: stats.maintenance, color: '#F87171', total: stats.totalTrucks },
+              ].map((row, i) => (
+                <div key={i}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+                    <span style={{ fontSize: '0.8125rem', color: '#8D97A5', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: row.color, display: 'inline-block' }}></span>
+                      {row.label}
+                    </span>
+                    <span className="number-font" style={{ fontSize: '0.8125rem', fontWeight: '600' }}>{row.val}<span style={{ color: '#5F6A78', fontWeight: '400' }}> / {row.total}</span></span>
+                  </div>
+                  <div style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: row.total > 0 ? `${(row.val / row.total) * 100}%` : '0%', backgroundColor: row.color, borderRadius: '2px', transition: 'width 0.4s ease-out' }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Alerts */}
+          <div className="card" style={{ flex: 1 }}>
+            <h3 style={{ fontSize: '0.8125rem', color: '#5F6A78', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '1rem' }}>Active Alerts</h3>
+            {stats.pendingBookings > 0 ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(232, 149, 94, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <AlertTriangle size={16} color="#E8955E" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '0.8125rem', fontWeight: '600' }}>{stats.pendingBookings} pending booking{stats.pendingBookings > 1 ? 's' : ''}</p>
+                  <p style={{ fontSize: '0.75rem', color: '#5F6A78' }}>Awaiting price confirmation</p>
+                </div>
+                <span style={{ fontSize: '0.6875rem', color: '#5F6A78' }}>now</span>
+              </div>
+            ) : (
+              <p style={{ fontSize: '0.8125rem', color: '#5F6A78' }}>No active alerts</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Bookings Table */}
+      <div className="card" style={{ padding: 0 }}>
+        <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <h3 style={{ fontSize: '0.8125rem', color: '#5F6A78', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Recent Bookings</h3>
+        </div>
+
         {recentBookings.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem', fontSize: '0.875rem' }}>No bookings yet.</p>
+          <p style={{ color: '#5F6A78', textAlign: 'center', padding: '2.5rem', fontSize: '0.8125rem' }}>No bookings recorded yet.</p>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8125rem' }}>
             <thead>
-              <tr style={{ borderBottom: '0.5px solid var(--border-hairline)' }}>
-                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>ID</th>
-                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Customer</th>
-                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Date</th>
-                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>Status</th>
-                <th style={{ padding: '0.75rem 0', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'right' }}>Amount</th>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                {['ID', 'CUSTOMER', 'TYPE', 'DATE', 'STATUS', 'AMOUNT'].map(h => (
+                  <th key={h} style={{ padding: '0.75rem 1.5rem', fontWeight: '600', color: '#5F6A78', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {recentBookings.map((booking) => (
-                <tr key={booking.id} style={{ borderBottom: '0.5px solid var(--border-hairline)' }}>
-                  <td className="number-font" style={{ padding: '0.75rem 0', color: 'var(--amber-text)' }}>{booking.id.substring(0, 8)}</td>
-                  <td style={{ padding: '0.75rem 0' }}>{booking.customer?.[0]?.first_name || '—'} {booking.customer?.[0]?.last_name || ''}</td>
-                  <td className="number-font" style={{ padding: '0.75rem 0', color: 'var(--text-secondary)' }}>{new Date(booking.created_at).toLocaleDateString()}</td>
-                  <td style={{ padding: '0.75rem 0' }}>{getStatusPill(booking.status)}</td>
-                  <td className="number-font" style={{ padding: '0.75rem 0', textAlign: 'right' }}>
-                    {booking.estimated_price ? `₹${Number(booking.estimated_price).toFixed(0)}` : '—'}
-                  </td>
+              {recentBookings.map((b) => (
+                <tr key={b.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td className="number-font" style={{ padding: '0.75rem 1.5rem', color: '#E8955E' }}>{b.id.substring(0, 8)}</td>
+                  <td style={{ padding: '0.75rem 1.5rem' }}>{b.customer?.[0]?.first_name || '—'} {b.customer?.[0]?.last_name || ''}</td>
+                  <td style={{ padding: '0.75rem 1.5rem', color: '#8D97A5' }}>{b.booking_type || 'material'}</td>
+                  <td className="number-font" style={{ padding: '0.75rem 1.5rem', color: '#5F6A78' }}>{new Date(b.created_at).toLocaleDateString()}</td>
+                  <td style={{ padding: '0.75rem 1.5rem' }}>{getStatusPill(b.status)}</td>
+                  <td className="number-font" style={{ padding: '0.75rem 1.5rem' }}>{b.estimated_price ? `₹${Number(b.estimated_price).toLocaleString()}` : '—'}</td>
                 </tr>
               ))}
             </tbody>
