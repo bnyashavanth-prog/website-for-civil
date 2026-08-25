@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: "Construction materials and reliable truck delivery.",
 };
 
+import ThemeProvider from "@/components/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -17,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.variable}>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -71,6 +71,44 @@
 }
 
 /* ═══════════════════════════════════════════════
+   LIGHT MODE VARIABLES
+   ═══════════════════════════════════════════════ */
+:root.theme-light {
+  --bg-base: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --border-hairline: rgba(0, 0, 0, 0.1);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  
+  --text-on-amber: #FFFFFF;
+  --amber-text: #C2410C;
+  --teal-text: #0F766E;
+  
+  --status-success: #16A34A;
+  --status-warning: #D97706;
+  --status-danger: #DC2626;
+}
+
+:root.theme-light .theme-fig2 {
+  --bg-base: #F1F5F9;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #E2E8F0;
+  --border-hairline: rgba(0, 0, 0, 0.08);
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  
+  --text-on-copper: #FFFFFF;
+  --copper-text: #C2410C;
+  --cyan-text: #0369A1;
+
+  --text-on-amber: #FFFFFF;
+  --amber-text: #C2410C;
+  --teal-text: #0369A1;
+}
+
+/* ═══════════════════════════════════════════════
    Global resets
    ═══════════════════════════════════════════════ */
 
@@ -318,4 +356,45 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════
+   Light Mode Component Overrides
+   ═══════════════════════════════════════════════ */
+
+:root.theme-light body {
+  background-color: #F8FAFC;
+}
+
+:root.theme-light .card {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+:root.theme-light .btn-outline:hover {
+  background-color: rgba(0,0,0,0.04);
+}
+
+:root.theme-light .input {
+  background-color: #FFFFFF;
+}
+
+:root.theme-light .status-success {
+  background-color: rgba(22, 163, 74, 0.1);
+}
+:root.theme-light .status-warning {
+  background-color: rgba(217, 119, 6, 0.1);
+}
+:root.theme-light .status-danger {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+:root.theme-light .status-teal {
+  background-color: rgba(15, 118, 110, 0.1);
+}
+:root.theme-light .status-blue {
+  background-color: rgba(76, 110, 245, 0.1);
+}
+
+:root.theme-light .theme-fig2 .card-live {
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  border-color: rgba(76,110,245,0.2);
 }
