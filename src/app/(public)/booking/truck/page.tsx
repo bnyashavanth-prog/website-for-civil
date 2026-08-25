@@ -39,8 +39,8 @@ export default function TruckBooking() {
         tenant_id: tenantId,
         customer_id: user.id,
         booking_type: 'truck_only',
-        quantity: formData.capacity, // Using quantity field for capacity for now
-        delivery_location: formData.location,
+        quantity: parseInt(formData.capacity) || 0,
+        delivery_location: formData.location + (formData.materialType ? ` (Material: ${formData.materialType})` : ''),
         delivery_date: formData.date,
         status: 'pending'
       });
@@ -80,9 +80,9 @@ export default function TruckBooking() {
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Truck Capacity Needed</label>
                 <select className="input" required value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})}>
                   <option value="">-- Select Capacity --</option>
-                  <option value="10_wheel">10-Wheeler (approx. 16-20 Tons)</option>
-                  <option value="14_wheel">14-Wheeler (approx. 25-30 Tons)</option>
-                  <option value="16_wheel">16-Wheeler (approx. 35-40 Tons)</option>
+                  <option value="10">10-Wheeler (approx. 16-20 Tons)</option>
+                  <option value="14">14-Wheeler (approx. 25-30 Tons)</option>
+                  <option value="16">16-Wheeler (approx. 35-40 Tons)</option>
                 </select>
               </div>
               <div>

@@ -1,30 +1,12 @@
 import Link from "next/link";
 import { HardHat } from "lucide-react";
+import PublicHeader from "./PublicHeader";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-base)' }}>
-      {/* Industrial Dark Header */}
-      <header style={{ 
-        position: 'sticky', top: 0, zIndex: 50, 
-        backgroundColor: 'rgba(30, 26, 20, 0.95)', backdropFilter: 'blur(10px)',
-        borderBottom: '0.5px solid var(--border-hairline)',
-        padding: '1.25rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-      }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '500', fontSize: '1.125rem', color: 'var(--text-primary)' }}>
-          <HardHat size={24} color="var(--accent-amber)" />
-          <span>SS Build</span>
-        </Link>
-        <nav style={{ display: 'flex', gap: '2rem', fontWeight: '400', fontSize: '0.875rem' }}>
-          <Link href="/#services" className="nav-link" style={{ padding: '0.5rem' }}>Services</Link>
-          <Link href="/#materials" className="nav-link" style={{ padding: '0.5rem' }}>Materials</Link>
-          <Link href="/track" className="nav-link" style={{ padding: '0.5rem' }}>Track Order</Link>
-        </nav>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Link href="/login" className="btn btn-outline">Login</Link>
-          <Link href="/booking" className="btn btn-primary">Book Materials</Link>
-        </div>
-      </header>
+      {/* Dynamic Client Header */}
+      <PublicHeader />
 
       {/* Main Content */}
       <main style={{ flex: 1 }}>
