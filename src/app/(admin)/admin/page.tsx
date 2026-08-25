@@ -118,20 +118,22 @@ export default function AdminDashboard() {
         {/* Live Fleet Map Placeholder */}
         <div className="card card-live" style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ height: '320px', backgroundColor: '#0D1117', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* Simulated map background */}
-            <div style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'radial-gradient(circle at 30% 40%, #4C6EF5 0%, transparent 50%), radial-gradient(circle at 70% 60%, #22D3EE 0%, transparent 40%)' }}></div>
+            {/* Google Maps Embed with Dark Mode CSS Filter */}
+            <iframe 
+              width="100%" 
+              height="100%" 
+              frameBorder="0" 
+              scrolling="no" 
+              marginHeight={0} 
+              marginWidth={0} 
+              src="https://maps.google.com/maps?width=100%25&amp;height=100%25&amp;hl=en&amp;q=Bangalore+(SS%20Build)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed" 
+              style={{ filter: 'invert(100%) hue-rotate(180deg) brightness(80%) contrast(120%)', position: 'absolute', inset: 0, zIndex: 0 }}
+            ></iframe>
             
-            {/* Simulated truck markers */}
-            <div className="pulse-marker" style={{ position: 'absolute', top: '35%', left: '30%', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22D3EE' }}></div>
-            <div className="pulse-marker" style={{ position: 'absolute', top: '55%', left: '55%', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22D3EE' }}></div>
-            <div style={{ position: 'absolute', top: '45%', left: '70%', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#34D399' }}></div>
-
-            {/* Center label */}
-            <div style={{ zIndex: 1, textAlign: 'center' }}>
-              <Truck size={28} color="#5F6A78" />
-              <p style={{ color: '#5F6A78', fontSize: '0.8125rem', marginTop: '0.75rem', fontWeight: '500' }}>Live fleet map</p>
-              <p style={{ color: '#3A4250', fontSize: '0.6875rem', marginTop: '0.25rem' }}>GPS integration coming soon</p>
-            </div>
+            {/* Simulated truck markers overlaid on map */}
+            <div className="pulse-marker" style={{ position: 'absolute', top: '35%', left: '30%', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#22D3EE', zIndex: 1, border: '2px solid #0B0E13' }}></div>
+            <div className="pulse-marker" style={{ position: 'absolute', top: '55%', left: '55%', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#22D3EE', zIndex: 1, border: '2px solid #0B0E13' }}></div>
+            <div style={{ position: 'absolute', top: '45%', left: '70%', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#34D399', zIndex: 1, border: '2px solid #0B0E13' }}></div>
           </div>
           <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.75rem', color: '#5F6A78', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: '600' }}>Active routes</span>
