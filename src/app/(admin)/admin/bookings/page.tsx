@@ -133,8 +133,16 @@ export default function BookingsPage() {
 
                   {/* Customer */}
                   <td style={{ padding: '0.75rem 1.25rem', whiteSpace: 'nowrap' }}>
-                    <div>{b.customer?.[0]?.first_name || '—'} {b.customer?.[0]?.last_name || ''}</div>
-                    <div style={{ fontSize: '0.6875rem', color: '#5F6A78' }}>{b.customer?.[0]?.phone || ''}</div>
+                    <div>
+                      {b.customer && !Array.isArray(b.customer) 
+                        ? `${b.customer.first_name || ''} ${b.customer.last_name || ''}`.trim() || '—'
+                        : `${b.customer?.[0]?.first_name || ''} ${b.customer?.[0]?.last_name || ''}`.trim() || '—'}
+                    </div>
+                    <div style={{ fontSize: '0.6875rem', color: '#5F6A78' }}>
+                      {b.customer && !Array.isArray(b.customer) 
+                        ? b.customer.phone || ''
+                        : b.customer?.[0]?.phone || ''}
+                    </div>
                   </td>
 
                   {/* Location */}

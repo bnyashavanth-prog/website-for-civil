@@ -149,7 +149,11 @@ function TrackOrderContent() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', fontSize: '0.8125rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-hairline)' }}>
                 <div>
                   <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Customer</p>
-                  <p style={{ fontWeight: '500' }}>{booking.customer?.[0]?.first_name || '—'} {booking.customer?.[0]?.last_name || ''}</p>
+                  <p style={{ fontWeight: '500' }}>
+                    {booking.customer && !Array.isArray(booking.customer) 
+                        ? `${booking.customer.first_name || ''} ${booking.customer.last_name || ''}`.trim() || '—'
+                        : `${booking.customer?.[0]?.first_name || ''} ${booking.customer?.[0]?.last_name || ''}`.trim() || '—'}
+                  </p>
                 </div>
                 <div>
                   <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Order Type</p>
